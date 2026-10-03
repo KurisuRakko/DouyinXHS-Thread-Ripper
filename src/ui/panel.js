@@ -78,7 +78,7 @@ hr { border: 0; border-top: 1px solid var(--color-border); margin: 8px 0; }
       lines.push(`${n.host.split(".")[0]}  ${(n.speed * 8 / 1000).toFixed(0)} Mbps`);
     }
     for (const r of v.records.slice(-4)) lines.push(`${r.state === "ready" ? "✓" : r.state === "failed" ? "✗" : `${Math.round(r.progress * 100)}%`} ${r.mb}MB ${r.label}`);
-    if (DXTR.site === "douyin") { const a = DXTR.sites.douyin.adStats(); lines.push(`广告 已删 ${a.removed}  已划走 ${a.skipped}`); }
+    if (DXTR.site === "douyin") { const a = DXTR.sites.douyin.adStats(); lines.push(`广告 已删 ${a.removed}  已划走 ${a.skipped}`); const p = DXTR.douyinImages.stats(); lines.push(`图集 已预下 ${p.cached}  秒开 ${p.hits}  未命中 ${p.misses}  排队 ${p.queued}`); }
     const img = DXTR.xhsImages && DXTR.site === "xhs" ? DXTR.xhsImages.stats() : null;
     if (img) {
       lines.push(`图片 改写 ${img.rewritten}  补发 ${img.hedged}/${img.hedgeWins}胜  回退 ${img.fallbacks}  预取 ${img.prefetched}`);

@@ -7,11 +7,13 @@
   DXTR.site = site;
   DXTR.sites[site].install();
   if (site === "xhs") DXTR.xhsImages?.install();
+  if (site === "douyin") DXTR.douyinImages?.install();
   DXTR.panel?.install();
 
   window.__dxtrDebug = {
     version: DXTR.version,
     sampleUrls: () => DXTR.videos.sampleUrls(),
+    prefetchPictures: (urls) => DXTR.douyinImages?.prefetch(urls, 0),
     report() {
       return JSON.stringify({
         version: DXTR.version,
@@ -24,6 +26,7 @@
         mseFetch: DXTR.mediaFetch.stats(),
         images: DXTR.xhsImages?.stats?.() || null,
         ads: site === "douyin" ? DXTR.sites.douyin.adStats() : null,
+        pictures: site === "douyin" ? DXTR.douyinImages.stats() : null,
         log: DXTR.log.lines().slice(-60)
       }, null, 2);
     }

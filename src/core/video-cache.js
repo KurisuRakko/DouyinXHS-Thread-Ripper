@@ -38,6 +38,7 @@ DXTR.videos = (() => {
       if (entry.size) old.size = entry.size;
       if (entry.owner) old.owner = entry.owner;
       if (entry.mseParts) old.mseParts = entry.mseParts;
+      if (entry.pictures) old.pictures = entry.pictures;
     } else {
       entries.set(entry.key, { ...entry });
     }
@@ -80,6 +81,11 @@ DXTR.videos = (() => {
   // Starts (or re-prioritises) the download of an entry. Returns its record.
   function ensure(entry, priority) {
     const s = DXTR.settings.get();
+    // A picture post: load its pictures; the music itself is left to the page.
+    if (entry.pictures) {
+      DXTR.douyinImages?.prefetch(entry.pictures, priority);
+      return null;
+    }
     let rec = records.get(entry.key);
     if (rec && rec.state === "failed") return rec;
     if (rec) {
@@ -155,6 +161,26 @@ DXTR.videos = (() => {
     return [item];
   }
 
+  // Prefetch the posts after `key` without declaring it the post on screen: used when a
+  // picture of a post gets shown, which the page also does for neighbouring posts.
+  let lastWindow = "";
+  function prefetchWindowOf(key) {
+    const s = DXTR.settings.get();
+    if (!s.enabled || !s.video || key === lastWindow) return;
+    lastWindow = key;
+    const at = feed.indexOf(key);
+    if (at < 0) return;
+    let added = 0;
+    for (let i = at + 1; i < feed.length && added < s.prefetchNext; i += 1) {
+      const next = entries.get(feed[i]);
+      if (!next) continue;
+      const files = filesOf(next);
+      if (files.reduce((sum, f) => sum + (f.size || 0), 0) > s.prefetchMaxMB * MB) continue;
+      for (const f of files) ensure(f, 1 + added);
+      added += 1;
+    }
+  }
+
   function prefetchAfter(entry) {
     const s = DXTR.settings.get();
     if (!s.enabled || !s.video) return;
@@ -187,6 +213,7 @@ DXTR.videos = (() => {
     onSettled,
     prefetchAfter,
     isCurrent,
+    prefetchWindowOf,
     noteMse: (entry) => { if (entry.owner && entry.owner !== entry.key && !mseMode) { mseMode = true; DXTR.log("站点使用 MSE 分轨播放"); } },
     addUrlKey: (fn) => urlKeyFns.push(fn),
     originalOf: (blobUrl) => blobToOriginal.get(blobUrl) || null,
