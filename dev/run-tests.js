@@ -214,6 +214,26 @@ test("xhs: stream files registered, best first in each list, no list removed", (
   assert.ok(DXTR.videos.lookup("https://sns-video-al.xhscdn.com/stream/1/110/b.mp4?other=1"), "any node, any query");
 });
 
+test("douyin: ads are removed from feed lists, normal videos kept", () => {
+  const DXTR = loadSites();
+  const normal = JSON.parse(read("dev/fixtures/douyin-detail.json")).aweme_detail;
+  const mk = (id, extra) => ({ ...JSON.parse(JSON.stringify(normal)), aweme_id: id, ...extra });
+  const feed = { aweme_list: [
+    mk("1", { is_ads: false, raw_ad_data: null, commerce_info: { ad_type: 0, is_ad: false } }),
+    mk("2", { is_ads: true }),
+    mk("3", { raw_ad_data: "{\"creative_id\":1}" }),
+    mk("4", { commerce_info: { is_ad: true } }),
+    mk("5", { raw_ad_data: "" })
+  ], ad_candidates: [{}] };
+  DXTR.sites.douyin.removeAds(feed, 0);
+  assert.deepEqual(feed.aweme_list.map((a) => a.aweme_id), ["1", "5"]);
+  assert.deepEqual(feed.ad_candidates, [], "emptied, still an array");
+  // search results wrap awemes in { aweme_info }
+  const search = { data: [{ type: 1, aweme_info: mk("6", { is_ads: true }) }, { type: 1, aweme_info: mk("7", {}) }] };
+  DXTR.sites.douyin.removeAds(search, 0);
+  assert.deepEqual(search.data.map((d) => d.aweme_info.aweme_id), ["7"]);
+});
+
 test("cache eviction never revokes the blob a <video> is playing", async () => {
   const bytes = randomBytes(600 * 1024);
   const server = mockServer(bytes);

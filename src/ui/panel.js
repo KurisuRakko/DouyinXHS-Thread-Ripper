@@ -78,6 +78,7 @@ hr { border: 0; border-top: 1px solid var(--color-border); margin: 8px 0; }
       lines.push(`${n.host.split(".")[0]}  ${(n.speed * 8 / 1000).toFixed(0)} Mbps`);
     }
     for (const r of v.records.slice(-4)) lines.push(`${r.state === "ready" ? "✓" : r.state === "failed" ? "✗" : `${Math.round(r.progress * 100)}%`} ${r.mb}MB ${r.label}`);
+    if (DXTR.site === "douyin") { const a = DXTR.sites.douyin.adStats(); lines.push(`广告 已删 ${a.removed}  已划走 ${a.skipped}`); }
     const img = DXTR.xhsImages && DXTR.site === "xhs" ? DXTR.xhsImages.stats() : null;
     if (img) {
       lines.push(`图片 改写 ${img.rewritten}  补发 ${img.hedged}/${img.hedgeWins}胜  回退 ${img.fallbacks}  预取 ${img.prefetched}`);
@@ -103,6 +104,7 @@ hr { border: 0; border-top: 1px solid var(--color-border); margin: 8px 0; }
       toggle("quality", "自动最高画质", "只在网站给出的画质里挑", () => S.get().quality === "best",
         () => S.set({ quality: S.get().quality === "best" ? "site" : "best" })),
       ...(DXTR.site === "xhs" ? [toggle("images", "图片换最快节点", "测速选节点，慢图自动补发")] : []),
+      ...(DXTR.site === "douyin" ? [toggle("adblock", "去广告", "推荐流里的广告直接删掉，漏网的自动划走")] : []),
       choice("threads", "并发线程", [["auto", "自动"], ...S.THREAD_CHOICES.map((n) => [n, String(n)])]),
       choice("prefetchNext", "预加载后面几条", [0, 1, 2, 3, 4, 5].map((n) => [n, String(n)])),
       choice("cacheMB", "内存缓存上限", [[150, "150 MB"], [300, "300 MB"], [600, "600 MB"], [1000, "1 GB"]]),

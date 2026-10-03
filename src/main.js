@@ -23,6 +23,7 @@
         media: DXTR.mediaHook.stats(),
         mseFetch: DXTR.mediaFetch.stats(),
         images: DXTR.xhsImages?.stats?.() || null,
+        ads: site === "douyin" ? DXTR.sites.douyin.adStats() : null,
         log: DXTR.log.lines().slice(-60)
       }, null, 2);
     }
