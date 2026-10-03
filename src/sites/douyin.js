@@ -124,10 +124,87 @@ DXTR.sites.douyin = (() => {
     return "";
   }
 
-  function install() {
-    DXTR.videos.addUrlKey(urlKey);
-    DXTR.jsonHook.add({ match: (url) => API_RE.test(url), transform: (obj) => walk(obj, 0) });
+  // ---- ads ----------------------------------------------------------------------------------
+  // Every aweme says whether it is an ad: is_ads, raw_ad_data, commerce_info.is_ad. Ads are
+  // taken out of the lists before the page sees them, so the player never gets them.
+  let adsRemoved = 0;
+  let adsSkipped = 0;
+
+  function isAd(item) {
+    const a = item && typeof item === "object" ? (item.aweme_info || item) : null;
+    if (!a || !(a.aweme_id || a.aweme_info)) return false;
+    let raw = a.raw_ad_data;
+    if (typeof raw === "string") raw = raw.trim() && raw !== "null" && raw !== "{}";
+    return a.is_ads === true || !!raw || a.commerce_info?.is_ad === true;
   }
 
-  return { install, pickBest, urlKey, walk };
+  function removeAds(node, depth) {
+    if (!node || typeof node !== "object" || depth > 8) return;
+    if (Array.isArray(node)) {
+      for (let i = node.length - 1; i >= 0; i -= 1) {
+        if (isAd(node[i])) { node.splice(i, 1); adsRemoved += 1; }
+        else removeAds(node[i], depth + 1);
+      }
+      return;
+    }
+    if (Array.isArray(node.ad_candidates)) node.ad_candidates = []; // ads queued for later; keep the type
+    for (const key in node) {
+      if (key === "video") continue;
+      const value = node[key];
+      if (value && typeof value === "object") removeAds(value, depth + 1);
+    }
+  }
+
+  // Fallback for ads that arrive some other way: the video on screen shows a "广告" tag →
+  // go to the next one (the same as pressing ↓).
+  function skipVisibleAds() {
+    let lastSkipped = null;
+    setInterval(() => {
+      const s = DXTR.settings.get();
+      if (!s.enabled || !s.adblock) return;
+      // The video on screen: playing, and the most of it inside the viewport (the feed also
+      // keeps the next video mounted and sometimes playing, off screen).
+      const visible = (el) => {
+        const r = el.getBoundingClientRect();
+        return Math.max(0, Math.min(r.bottom, innerHeight) - Math.max(r.top, 0)) * Math.max(0, Math.min(r.right, innerWidth) - Math.max(r.left, 0));
+      };
+      let video = null;
+      let best = 0;
+      for (const v of document.querySelectorAll("video")) {
+        const area = !v.paused && v.isConnected ? visible(v) : 0;
+        if (area > best) { best = area; video = v; }
+      }
+      if (!video || best < innerWidth * innerHeight * 0.2) return;
+      // The slide that holds this video: the nearest ancestor that also holds its caption.
+      let box = video.parentElement;
+      for (let i = 0; i < 8 && box && box.getBoundingClientRect().height < innerHeight * 0.6; i += 1) box = box.parentElement;
+      if (!box || box === lastSkipped) return;
+      const tag = [...box.querySelectorAll("span, div")].find((el) => el.childElementCount === 0 && el.textContent.trim() === "广告" && visible(el) > 0);
+      if (!tag) return;
+      lastSkipped = box;
+      adsSkipped += 1;
+      DXTR.log("跳过广告");
+      // The player's own "next" button if there is one, else the ↓ key it listens to.
+      const next = document.querySelector('[data-e2e="video-switch-next-arrow"], .xgplayer-playswitch-next');
+      if (next) { next.click(); return; }
+      for (const type of ["keydown", "keyup"]) {
+        document.dispatchEvent(new KeyboardEvent(type, { key: "ArrowDown", code: "ArrowDown", keyCode: 40, which: 40, bubbles: true }));
+      }
+    }, 700);
+  }
+
+  function install() {
+    DXTR.videos.addUrlKey(urlKey);
+    DXTR.jsonHook.add({
+      match: (url) => API_RE.test(url),
+      transform: (obj) => {
+        const s = DXTR.settings.get();
+        if (s.enabled && s.adblock) removeAds(obj, 0);
+        walk(obj, 0);
+      }
+    });
+    skipVisibleAds();
+  }
+
+  return { install, pickBest, urlKey, walk, removeAds, isAd, adStats: () => ({ removed: adsRemoved, skipped: adsSkipped }) };
 })();
