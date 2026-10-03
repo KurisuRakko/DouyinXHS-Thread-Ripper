@@ -1,0 +1,104 @@
+/* rk-sheet：底部抽屉，视觉移植 showcase snippets/Sheet.tsx 的内联样式。
+   backdrop 随下滑进度变淡；popup 位移跟随 --drawer-swipe-movement-y（Base UI 滑动变量）。 */
+
+.rk-sheet__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--layer-overlay);
+  background: rgb(0 0 0 / var(--glass-scrim-opacity));
+  opacity: calc(1 - var(--drawer-swipe-progress, 0));
+  transition:
+    opacity var(--motion-duration-enter) var(--motion-ease-standard);
+}
+
+.rk-sheet__backdrop[data-starting-style],
+.rk-sheet__backdrop[data-ending-style] {
+  opacity: 0;
+}
+
+.rk-sheet__backdrop[data-ending-style] {
+  transition-duration: var(--motion-duration-exit);
+}
+
+/* 下滑跟手时 backdrop 不做过渡（进度变量实时驱动）。 */
+.rk-sheet__backdrop[data-swiping] {
+  transition: none;
+}
+
+.rk-sheet__viewport {
+  position: fixed;
+  inset: 0;
+  z-index: var(--layer-overlay);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.rk-sheet__viewport > * {
+  pointer-events: auto;
+}
+
+.rk-sheet {
+  width: 100%;
+  max-height: 75%;
+  padding: 12px 24px calc(32px + env(safe-area-inset-bottom));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-width: 1px 0 0;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  box-shadow: inset 0 1px 0 var(--glass-highlight), 0 -4px 24px rgba(0, 0, 0, 0.05);
+  translate: 0 var(--drawer-swipe-movement-y, 0px);
+  transition: translate var(--motion-duration-enter)
+    var(--motion-ease-standard);
+}
+
+.rk-sheet[data-starting-style],
+.rk-sheet[data-ending-style] {
+  translate: 0 100%;
+}
+
+.rk-sheet[data-ending-style] {
+  transition-duration: var(--motion-duration-exit);
+}
+
+/* 跟手滑动时不做过渡。 */
+.rk-sheet[data-swiping] {
+  transition: none;
+}
+
+.rk-sheet__content {
+  min-width: 0;
+}
+
+.rk-sheet__handle {
+  width: 36px;
+  height: 4px;
+  margin: 0 auto 16px;
+  border-radius: 2px;
+  background: var(--color-neutral-4);
+}
+
+.rk-sheet__title {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--color-neutral-10);
+}
+
+.rk-sheet__description {
+  margin: 0 0 16px;
+  color: var(--color-neutral-7);
+  line-height: 1.55;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rk-sheet__backdrop,
+  .rk-sheet,
+  .rk-sheet[data-starting-style],
+  .rk-sheet[data-ending-style] {
+    transition: none;
+    translate: none;
+  }
+}

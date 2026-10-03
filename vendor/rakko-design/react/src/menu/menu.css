@@ -1,0 +1,80 @@
+/* rk-menu 浮层视觉：paper 底 + border 描边 + whisper 阴影（契约的 ring-or-whisper 深度），
+   圆角 8px 与 .motion-chips 等 showcase 控件同级。 */
+
+/* Positioner 是 Popup 的父层（Base UI 的定位元素）：层级写在它身上，
+   Popup 的 rk-* 类名仍然只属于 Popup，消费方的 className 也照旧追加在那里。 */
+.rk-menu__positioner {
+  z-index: var(--layer-popup);
+}
+
+.rk-menu {
+  box-sizing: border-box;
+  min-width: 180px;
+  padding: 4px;
+  border-radius: 8px;
+  opacity: 1;
+  transition:
+    opacity var(--motion-duration-enter) var(--motion-ease-standard),
+    translate var(--motion-duration-enter) var(--motion-ease-standard);
+}
+
+.rk-menu[data-starting-style],
+.rk-menu[data-ending-style] {
+  opacity: 0;
+  translate: 0 4px;
+}
+
+.rk-menu[data-ending-style] {
+  transition-duration: var(--motion-duration-exit);
+}
+
+.rk-menu__item {
+  position: relative;
+  padding: 7px 10px;
+  border-radius: 6px;
+  color: var(--color-neutral-9);
+  font-size: 13px;
+  line-height: 1.4;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--motion-duration-state)
+    var(--motion-ease-standard);
+}
+
+.rk-menu__item[data-highlighted] {
+  background: color-mix(
+    in srgb,
+    var(--color-neutral-10) var(--state-hover-opacity),
+    transparent
+  );
+}
+
+.rk-menu__item[data-disabled] {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.rk-menu__separator {
+  height: 1px;
+  margin: 4px 0;
+  background: var(--color-border);
+}
+
+.rk-menu__group-label {
+  padding: 6px 10px;
+  font-size: 12px;
+  color: var(--color-neutral-7);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rk-menu,
+  .rk-menu[data-starting-style],
+  .rk-menu[data-ending-style] {
+    transition-duration: 1ms;
+    translate: none;
+  }
+
+  .rk-menu__item {
+    transition-duration: 1ms;
+  }
+}

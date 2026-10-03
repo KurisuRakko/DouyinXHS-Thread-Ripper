@@ -1,0 +1,11 @@
+{
+  "name": "douyinxhs-thread-ripper",
+  "private": true,
+  "description": "抖音 / 小红书网页版加速油猴脚本",
+  "license": "MIT",
+  "type": "commonjs",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node dev/run-tests.js"
+  }
+}
