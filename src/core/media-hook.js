@@ -137,9 +137,13 @@ DXTR.mediaHook = (() => {
     const ahead = bufferedAhead(video);
     const fullyBuffered = duration && ahead >= duration - video.currentTime - 0.3;
     if (fullyBuffered) return;
-    // Before the first frame a switch costs nothing; during playback only when native
-    // loading is about to run dry or already stalled.
-    const notStarted = video.currentTime < 0.5 && video.readyState < 3;
+    // Before the first frame (autoplay waiting for data) a switch costs nothing; during
+    // playback only when native loading is about to run dry or already stalled.
+    // A paused video that already shows a frame is never touched: reloading it blanks the
+    // element (on Xiaohongshu that turned live photos black). Before any frame is drawn
+    // (readyState < 2) a reload is invisible, so a preloading next video can still switch.
+    if (video.paused && video.readyState >= 2) return;
+    const notStarted = video.currentTime < 0.5 && video.readyState < (video.paused ? 2 : 3);
     const struggling = !video.paused && (video.readyState < 3 || ahead < 2 || w.stalls > 0);
     if (!notStarted && !struggling) return;
     w.swapped = entry.key;

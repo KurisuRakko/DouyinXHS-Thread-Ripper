@@ -255,6 +255,19 @@ test("douyin: picture posts join the feed and queue their pictures", () => {
   assert.ok(DXTR.videos.isCurrent(cur), "video still current");
 });
 
+test("xhs: live photo clips are not taken over", () => {
+  const DXTR = loadSites();
+  const clip = { height: 1440, width: 1080, size: 900000, masterUrl: "http://sns-video-bd.xhscdn.com/stream/1/live/clip.mp4", backupUrls: [] };
+  const state = { note: { noteDetailMap: { n1: { note: { title: "live", imageList: [
+    { urlDefault: "https://sns-webpic-qc.xhscdn.com/1/ab/tok!nd_dft_wlteh_webp_3", livePhoto: true, stream: { h264: [clip], h265: [] } }
+  ] } } } } };
+  const apiItem = { image_list: [{ url_default: "x", live_photo: true, stream: { h264: [{ ...clip, masterUrl: "http://sns-video-bd.xhscdn.com/stream/1/live/clip2.mp4" }] } }] };
+  DXTR.sites.xhs.walk(state.note.noteDetailMap, 0, "");
+  DXTR.sites.xhs.walk(apiItem, 0, "");
+  assert.equal(DXTR.videos.lookup("https://sns-video-bd.xhscdn.com/stream/1/live/clip.mp4"), null);
+  assert.equal(DXTR.videos.lookup("https://sns-video-bd.xhscdn.com/stream/1/live/clip2.mp4"), null);
+});
+
 test("cache eviction never revokes the blob a <video> is playing", async () => {
   const bytes = randomBytes(600 * 1024);
   const server = mockServer(bytes);

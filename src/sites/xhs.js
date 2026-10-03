@@ -46,7 +46,10 @@ DXTR.sites.xhs = (() => {
     if (!node || typeof node !== "object" || depth > 12) return;
     if (Array.isArray(node)) { for (const item of node) walk(item, depth + 1, label); return; }
     if (node.title || node.displayTitle) label = String(node.title || node.displayTitle).slice(0, 24);
-    if (node.stream && typeof node.stream === "object" && !Array.isArray(node.stream)) handleStream(node.stream, label || "");
+    // A picture with a stream is a live photo (实况图): its short clip is left entirely to
+    // the site's own player.
+    const isPicture = node.livePhoto || node.live_photo || "urlDefault" in node || "url_default" in node || "infoList" in node || "info_list" in node;
+    if (node.stream && typeof node.stream === "object" && !Array.isArray(node.stream) && !isPicture) handleStream(node.stream, label || "");
     for (const key in node) {
       if (key === "stream") continue;
       const value = node[key];
