@@ -234,6 +234,27 @@ test("douyin: ads are removed from feed lists, normal videos kept", () => {
   assert.deepEqual(search.data.map((d) => d.aweme_info.aweme_id), ["7"]);
 });
 
+test("douyin: picture posts join the feed and queue their pictures", () => {
+  const DXTR = loadSites();
+  const queued = [];
+  DXTR.douyinImages = { registerPost: () => {}, prefetch: (urls, p) => queued.push([urls.length, p]) };
+  const video = JSON.parse(read("dev/fixtures/douyin-detail.json")).aweme_detail;
+  const pic = (n) => ({ url_list: [`https://p3-pc-sign.douyinpic.com/tos-cn-i-x/abc${n}~tplv-dy-aweme-images:q75.webp?s=1`, `https://p3-pc-sign.douyinpic.com/tos-cn-i-x/abc${n}~tplv-dy-aweme-images:q75.jpeg?s=1`] });
+  const post = { aweme_id: "9", desc: "pics", images: [pic(1), pic(2), pic(3)], video: { play_addr: { url_list: ["https://sf11-cdn-tos.douyinstatic.com/obj/ies-music/1.mp3"] } } };
+  DXTR.sites.douyin.walk({ aweme_list: [{ ...video, aweme_id: "8" }, post] }, 0);
+  assert.equal(DXTR.videos.lookup("https://sf11-cdn-tos.douyinstatic.com/obj/ies-music/1.mp3"), null, "shared music URL is not an identity");
+  const entry = DXTR.videos.lookup("dypic:9");
+  assert.equal(entry.key, "dypic:9");
+  assert.deepEqual(entry.pictures.map((u) => /webp/.test(u)), [true, true, true], "webp variant chosen");
+  // the video before it starts playing → the picture post is "next" → its pictures queue up
+  DXTR.videos.prefetchAfter(DXTR.videos.lookup(video.video.play_addr.url_list[0]) || DXTR.videos.lookup(JSON.parse(read("dev/fixtures/douyin-detail.json")).aweme_detail.video.bit_rate[0].play_addr.url_list[0]));
+  assert.deepEqual(queued.at(-1), [3, 1]);
+  // showing a picture of some post must not change which video counts as on screen
+  const cur = DXTR.videos.lookup(JSON.parse(read("dev/fixtures/douyin-detail.json")).aweme_detail.video.bit_rate[0].play_addr.url_list[0]);
+  DXTR.videos.prefetchWindowOf("dypic:9");
+  assert.ok(DXTR.videos.isCurrent(cur), "video still current");
+});
+
 test("cache eviction never revokes the blob a <video> is playing", async () => {
   const bytes = randomBytes(600 * 1024);
   const server = mockServer(bytes);

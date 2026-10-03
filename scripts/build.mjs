@@ -18,6 +18,7 @@ export const FILES = [
   "src/core/json-hook.js",
   "src/core/media-hook.js",
   "src/sites/douyin.js",
+  "src/sites/douyin-images.js",
   "src/sites/xhs.js",
   "src/sites/xhs-images.js",
   "src/ui/panel.js",

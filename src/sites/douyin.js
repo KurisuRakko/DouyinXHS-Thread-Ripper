@@ -99,12 +99,26 @@ DXTR.sites.douyin = (() => {
     DXTR.videos.register({ key: owner, urls: cdnOnly(addr.url_list), size: addr.data_size || 0, label, mseParts: parts });
   }
 
+  // A picture post takes its place in the feed like a video, so "prefetch the next posts"
+  // covers it too. It is identified by its pictures only: the background music URL is
+  // shared by every post using the same song.
+  function handlePictures(node) {
+    const urls = node.images
+      .map((im) => (im?.url_list || []).find((u) => /\.webp\b/.test(u)) || im?.url_list?.[0])
+      .filter((u) => typeof u === "string" && u);
+    if (!urls.length) return;
+    const key = `dypic:${node.aweme_id}`;
+    DXTR.douyinImages?.registerPost(urls, key);
+    DXTR.videos.register({ key, urls: [key], size: 0, label: `[图集] ${String(node.desc || "").slice(0, 20)}`, pictures: urls });
+  }
+
   // Walk the response; anything with a video.play_addr is an aweme. Order is kept.
   function walk(node, depth) {
     if (!node || typeof node !== "object" || depth > 8) return;
     if (Array.isArray(node)) { for (const item of node) walk(item, depth + 1); return; }
-    // Picture posts (图文) also carry a video.play_addr: their background music. Skip them.
+    // Picture posts (图集) also carry a video.play_addr: their background music.
     const isPictures = Array.isArray(node.images) && node.images.length > 0;
+    if (isPictures && node.aweme_id) handlePictures(node);
     if (node.video && node.video.play_addr && (node.aweme_id || node.aweme_type !== undefined) && !isPictures) {
       handleVideo(node.video, String(node.desc || node.aweme_id || "").slice(0, 24));
     }
