@@ -1,0 +1,71 @@
+/* rk-snackbar 视觉移植自 showcase motion.css 的 .motion-snackbar；
+   单条底部居中，n-10 底 + whisper 阴影。视口不拦截点击（pointer-events: none）。 */
+
+.rk-snackbar-viewport {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  z-index: var(--layer-toast);
+  display: grid;
+  justify-items: center;
+  pointer-events: none;
+}
+
+/* 所有实例叠放同一格，淘汰中的旧实例在原位淡出，不挤动新实例。 */
+.rk-snackbar-viewport > * {
+  grid-area: 1 / 1;
+  pointer-events: auto;
+}
+
+.rk-snackbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: min(480px, 100%);
+  padding: 11px 12px 11px 16px;
+  border-radius: 8px;
+  opacity: 1;
+  transition:
+    opacity var(--motion-duration-enter) var(--motion-ease-standard),
+    translate var(--motion-duration-enter) var(--motion-ease-standard);
+}
+
+.rk-snackbar[data-starting-style],
+.rk-snackbar[data-ending-style] {
+  opacity: 0;
+  translate: 0 12px;
+}
+
+.rk-snackbar[data-ending-style] {
+  transition-duration: var(--motion-duration-exit);
+}
+
+/* limit 超出的旧实例由 Base UI 标记 data-limited 而非移除：隐藏并停止交互。 */
+.rk-snackbar[data-limited] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.rk-snackbar__action {
+  appearance: none;
+  padding: 7px 9px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-accent);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rk-snackbar,
+  .rk-snackbar[data-starting-style],
+  .rk-snackbar[data-ending-style] {
+    transition-duration: 1ms;
+    translate: none;
+  }
+}

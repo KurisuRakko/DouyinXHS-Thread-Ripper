@@ -1,0 +1,72 @@
+/* rk-dialog 视觉移植自 showcase snippets/Modal.tsx 的 scrim 与 panel。
+   遮罩只压暗不模糊，玻璃在面板上（data-glass="panel"，材质见 glass.css）。 */
+
+.rk-dialog__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--layer-overlay);
+  background: rgb(0 0 0 / var(--glass-scrim-opacity));
+  opacity: 1;
+  transition: opacity var(--motion-duration-enter) var(--motion-ease-standard);
+}
+
+.rk-dialog__backdrop[data-starting-style] {
+  opacity: 0;
+}
+
+.rk-dialog__backdrop[data-ending-style] {
+  opacity: 0;
+  transition-duration: var(--motion-duration-exit);
+}
+
+.rk-dialog {
+  box-sizing: border-box;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: var(--layer-overlay);
+  display: grid;
+  gap: 16px;
+  width: min(560px, calc(100vw - 32px));
+  padding: 24px;
+  border-radius: 12px;
+  opacity: 1;
+  transform: translate(-50%, -50%);
+  transition:
+    opacity var(--motion-duration-enter) var(--motion-ease-standard),
+    translate var(--motion-duration-enter) var(--motion-ease-standard);
+}
+
+/* 入场首帧 / 退场末帧：淡出 + 向下 8px 位移（位移走独立 translate 属性，不干扰居中 transform）。 */
+.rk-dialog[data-starting-style],
+.rk-dialog[data-ending-style] {
+  opacity: 0;
+  translate: 0 8px;
+}
+
+.rk-dialog[data-ending-style] {
+  transition-duration: var(--motion-duration-exit);
+}
+
+.rk-dialog__title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--color-neutral-10);
+}
+
+.rk-dialog__description {
+  margin: 8px 0 0;
+  color: var(--color-neutral-7);
+  line-height: 1.55;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rk-dialog__backdrop,
+  .rk-dialog,
+  .rk-dialog[data-starting-style],
+  .rk-dialog[data-ending-style] {
+    transition-duration: 1ms;
+    translate: none;
+  }
+}

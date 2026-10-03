@@ -1,0 +1,28 @@
+/* @rakko/react 样式入口：layers → state-layer → glass → 组件；build-css.mjs 按此顺序拼接 dist/styles.css。
+   layers.css 必须排第一：组件 CSS 的 z-index 全部写成 var(--layer-*)，变量得先落地。 */
+@import '../../design-system/src/layers.css';
+@import '../../design-system/src/state-layer.css';
+@import '../../design-system/src/glass.css';
+@import './button/button.css';
+@import './tooltip/tooltip.css';
+@import './switch/switch.css';
+@import './tabs/tabs.css';
+/* BottomNav 是 Tabs 的底栏容器扩展，紧跟依赖源；它的覆盖规则已用
+   .rk-bottom-nav 祖先前缀自锁，不依赖这里的拼接顺序。 */
+@import './bottom-nav/bottom-nav.css';
+/* SideNav 是同一套 Tabs 的桌面侧栏形态（与 BottomNav 同源、二选一渲染），
+   紧跟 BottomNav；覆盖规则同样已用 .rk-side-nav 祖先前缀自锁。 */
+@import './side-nav/side-nav.css';
+@import './dialog/dialog.css';
+@import './menu/menu.css';
+@import './filter-chip/filter-chip.css';
+@import './segmented-choice/segmented-choice.css';
+@import './checkbox/checkbox.css';
+@import './select/select.css';
+@import './popover/popover.css';
+@import './progress/progress.css';
+@import './snackbar/snackbar.css';
+@import './field/field.css';
+@import './copy-button/copy-button.css';
+@import './sheet/sheet.css';
+@import './top-bar/top-bar.css';
