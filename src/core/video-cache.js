@@ -109,14 +109,20 @@ DXTR.videos = (() => {
     return rec;
   }
 
+  function isCurrent(entry) {
+    return !!current && (entry.key === current.key || entry.owner === current.key);
+  }
+
   function onSettled(rec, fn) {
     if (rec.state === "loading") rec.waiters.push(fn);
     else fn(rec);
   }
 
+  // Reads the raw attribute: getAttribute("src") is patched by the media hook to report
+  // the original URL, so it would never show our blob: URL.
   function inUse(blobUrl) {
     for (const el of document.querySelectorAll("video, source")) {
-      if (el.getAttribute("src") === blobUrl) return true;
+      if (el.attributes.getNamedItem("src")?.value === blobUrl) return true;
     }
     return false;
   }
@@ -128,9 +134,11 @@ DXTR.videos = (() => {
     for (const r of records.values()) if (r.state === "ready") total += r.bytes;
     if (total <= limit) return;
     const ready = [...records.values()].filter((r) => r.state === "ready").sort((a, b) => a.usedAt - b.usedAt);
+    const now = performance.now();
     for (const r of ready) {
       if (total <= limit) break;
-      if (inUse(r.blobUrl)) continue;
+      // Never the file on screen, its DASH tracks, or anything a player read in the last 30 s.
+      if (inUse(r.blobUrl) || isCurrent(r.entry) || now - r.usedAt < 30000) continue;
       URL.revokeObjectURL(r.blobUrl);
       blobToOriginal.delete(r.blobUrl);
       records.delete(r.entry.key);
@@ -178,7 +186,7 @@ DXTR.videos = (() => {
     ensure,
     onSettled,
     prefetchAfter,
-    isCurrent: (entry) => !!current && (entry.key === current.key || entry.owner === current.key),
+    isCurrent,
     noteMse: (entry) => { if (entry.owner && entry.owner !== entry.key && !mseMode) { mseMode = true; DXTR.log("站点使用 MSE 分轨播放"); } },
     addUrlKey: (fn) => urlKeyFns.push(fn),
     originalOf: (blobUrl) => blobToOriginal.get(blobUrl) || null,

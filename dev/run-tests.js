@@ -19,7 +19,7 @@ function loadModules(files, { fetch } = {}) {
   const env = {
     window,
     localStorage: { getItem: (k) => store.get(k) ?? null, setItem: (k, v) => store.set(k, String(v)) },
-    document: { querySelectorAll: () => [], createElement: () => ({ canPlayType: () => "" }) },
+    document: { querySelectorAll: () => globalThis.__fakeElements || [], createElement: () => ({ canPlayType: () => "" }) },
     performance,
     URL: Object.assign(function (...a) { return new URL(...a); }, { createObjectURL: () => `blob:fake/${Math.random()}`, revokeObjectURL: () => {} }),
     console: { debug() {}, log: console.log, error: console.error },
@@ -212,6 +212,30 @@ test("xhs: stream files registered, best first in each list, no list removed", (
   assert.equal(st.EF4[0].height, 1080);
   assert.equal(st.EF5.length, 1, "lists are never emptied (codec names are opaque)");
   assert.ok(DXTR.videos.lookup("https://sns-video-al.xhscdn.com/stream/1/110/b.mp4?other=1"), "any node, any query");
+});
+
+test("cache eviction never revokes the blob a <video> is playing", async () => {
+  const bytes = randomBytes(600 * 1024);
+  const server = mockServer(bytes);
+  const DXTR = loadModules([...CORE, "src/core/video-cache.js"], { fetch: server.fetch });
+  const revoked = [];
+  DXTR.settings.set({ cacheMB: 50 }); // normalize clamps to ≥ 50 MB; fake sizes below exceed it
+  const V = DXTR.videos;
+  const a = V.register({ key: "a", urls: ["https://a.example/a.mp4"] });
+  const recA = V.ensure(a, 0);
+  await recA.dl.promise; await new Promise((r) => setTimeout(r, 0));
+  // Pretend the page plays A from its blob, with getAttribute patched like the media hook does.
+  const playing = { attributes: { getNamedItem: () => ({ value: recA.blobUrl }) }, getAttribute: () => "https://a.example/a.mp4" };
+  globalThis.__fakeElements = [playing];
+  recA.bytes = 40 * 1048576; recA.usedAt = -1e9;
+  const b = V.register({ key: "b", urls: ["https://a.example/b.mp4"] });
+  const recB = V.ensure(b, 0);
+  await recB.dl.promise; await new Promise((r) => setTimeout(r, 0));
+  recB.bytes = 40 * 1048576; recB.usedAt = -1e9;
+  const c = V.register({ key: "c", urls: ["https://a.example/c.mp4"] });
+  await V.ensure(c, 0).dl.promise; await new Promise((r) => setTimeout(r, 0));
+  assert.ok(V.record("a"), "A is on screen: kept");
+  assert.equal(V.record("b"), null, "B was evicted instead");
 });
 
 // ---- run ----------------------------------------------------------------------------------
