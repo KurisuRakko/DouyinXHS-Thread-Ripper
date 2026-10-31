@@ -1,7 +1,7 @@
 # 抖音 / 小红书 线程撕裂者（已停止维护）
 
 > **本仓库已拆分为以下两个仓库，此后不再更新：**
-> - 抖音：[KurisuRakko/Texas](https://github.com/KurisuRakko/Texas)
+> - 抖音：[KurisuRakko/Ptilopsis](https://github.com/KurisuRakko/Ptilopsis)
 > - 小红书：[KurisuRakko/Croissant](https://github.com/KurisuRakko/Croissant)
 
 适用于桌面浏览器的抖音、小红书网页版用户脚本（Tampermonkey / Violentmonkey），用于在海外网络环境下加快视频与图片加载。设计思路参考
@@ -24,7 +24,7 @@
 1. 在 Chrome 中安装 [Tampermonkey](https://www.tampermonkey.net/) 或 [Violentmonkey](https://violentmonkey.github.io/)。
 2. **Chrome 必需步骤**：打开 `chrome://extensions`，进入 Tampermonkey（或 Violentmonkey）的「详情」页，启用 **「允许运行用户脚本」**（旧版 Chrome 需启用右上角的「开发者模式」）。未启用时脚本不会运行。
 3. 两个站点各对应一个脚本，按需安装：
-   - 抖音：[**douyin.user.js**](https://raw.githubusercontent.com/KurisuRakko/Texas/main/user_scripts/douyin.user.js)
+   - 抖音：[**douyin.user.js**](https://raw.githubusercontent.com/KurisuRakko/Ptilopsis/main/user_scripts/douyin.user.js)
    - 小红书：[**xhs.user.js**](https://raw.githubusercontent.com/KurisuRakko/Croissant/main/user_scripts/xhs.user.js)
 
    如已安装旧版 `dxtr.user.js`，请先在脚本管理器中将其卸载，再安装本脚本。
