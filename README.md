@@ -2,7 +2,7 @@
 
 > **本仓库已拆分为以下两个仓库，此后不再更新：**
 > - 抖音：[KurisuRakko/Texas](https://github.com/KurisuRakko/Texas)
-> - 小红书：[KurisuRakko/Mostima](https://github.com/KurisuRakko/Mostima)
+> - 小红书：[KurisuRakko/Croissant](https://github.com/KurisuRakko/Croissant)
 
 适用于桌面浏览器的抖音、小红书网页版用户脚本（Tampermonkey / Violentmonkey），用于在海外网络环境下加快视频与图片加载。设计思路参考
 [Bilibili 线程撕裂者](https://github.com/MrTangLuyao/Bilibili-thread-ripper)（多连接、多节点并发下载），代码针对这两个站点独立实现。
@@ -25,7 +25,7 @@
 2. **Chrome 必需步骤**：打开 `chrome://extensions`，进入 Tampermonkey（或 Violentmonkey）的「详情」页，启用 **「允许运行用户脚本」**（旧版 Chrome 需启用右上角的「开发者模式」）。未启用时脚本不会运行。
 3. 两个站点各对应一个脚本，按需安装：
    - 抖音：[**douyin.user.js**](https://raw.githubusercontent.com/KurisuRakko/Texas/main/user_scripts/douyin.user.js)
-   - 小红书：[**xhs.user.js**](https://raw.githubusercontent.com/KurisuRakko/Mostima/main/user_scripts/xhs.user.js)
+   - 小红书：[**xhs.user.js**](https://raw.githubusercontent.com/KurisuRakko/Croissant/main/user_scripts/xhs.user.js)
 
    如已安装旧版 `dxtr.user.js`，请先在脚本管理器中将其卸载，再安装本脚本。
 4. 打开抖音或小红书网页版，页面右下角显示 **DX** 悬浮按钮即表示脚本已运行。点击该按钮可打开设置面板。
