@@ -1,5 +1,9 @@
 # 抖音 / 小红书 线程撕裂者
 
+> **已拆分为两个仓库**，本仓库不再更新：
+> - 抖音：[KurisuRakko/Douyin-Thread-Ripper](https://github.com/KurisuRakko/Douyin-Thread-Ripper)
+> - 小红书：[KurisuRakko/XHS-Thread-Ripper](https://github.com/KurisuRakko/XHS-Thread-Ripper)
+
 给海外用户用的油猴脚本：让抖音、小红书网页版的视频和图片加载得更快。思路来自
 [Bilibili 线程撕裂者](https://github.com/MrTangLuyao/Bilibili-thread-ripper)（多连接、多节点并发下载），代码是针对这两个站重新写的。
 
