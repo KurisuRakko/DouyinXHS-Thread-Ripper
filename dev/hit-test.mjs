@@ -4,7 +4,7 @@
 import { readFileSync } from "node:fs";
 import { connectPage, sleep } from "./cdp.mjs";
 
-const script = readFileSync(new URL("../user_scripts/dxtr.user.js", import.meta.url), "utf8");
+const script = readFileSync(new URL("../user_scripts/douyin.user.js", import.meta.url), "utf8");
 const page = await connectPage();
 const measure = (pick) => `(async () => {
   const recs = __dxtrDebug && JSON.parse(__dxtrDebug.report());

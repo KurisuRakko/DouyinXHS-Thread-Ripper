@@ -5,7 +5,7 @@ import { connectPage, sleep } from "./cdp.mjs";
 
 const off = process.argv.includes("--off");
 const swipes = Number(process.argv.find((a) => /^\d+$/.test(a)) || 5);
-const script = readFileSync(new URL("../user_scripts/dxtr.user.js", import.meta.url), "utf8");
+const script = readFileSync(new URL("../user_scripts/douyin.user.js", import.meta.url), "utf8");
 const page = await connectPage();
 const key = async (k, code) => {
   await page.send("Input.dispatchKeyEvent", { type: "keyDown", key: k, code, windowsVirtualKeyCode: 40 });

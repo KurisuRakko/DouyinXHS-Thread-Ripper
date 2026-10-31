@@ -19,7 +19,11 @@
 
 1. 在 Chrome 里装 [Tampermonkey](https://www.tampermonkey.net/) 或 [暴力猴 Violentmonkey](https://violentmonkey.github.io/)。
 2. **Chrome 必做**：打开 `chrome://extensions` → 找到 Tampermonkey（或暴力猴）→「详情」→ 打开 **「允许运行用户脚本」**（旧版 Chrome 是打开右上角「开发者模式」）。不开的话脚本不会运行。
-3. 点这里安装：[**dxtr.user.js**](https://raw.githubusercontent.com/KurisuRakko/DouyinXHS-Thread-Ripper/main/user_scripts/dxtr.user.js)
+3. 两个站各一个脚本，用哪个装哪个：
+   - 抖音：[**douyin.user.js**](https://raw.githubusercontent.com/KurisuRakko/DouyinXHS-Thread-Ripper/main/user_scripts/douyin.user.js)
+   - 小红书：[**xhs.user.js**](https://raw.githubusercontent.com/KurisuRakko/DouyinXHS-Thread-Ripper/main/user_scripts/xhs.user.js)
+
+   以前装过 `dxtr.user.js` 的，先在油猴里卸掉旧脚本再装新的。
 4. 打开抖音或小红书，右下角出现 **DX** 小圆球就说明在工作。点它打开设置。
 
 有新版时 Tampermonkey 会自动更新。
@@ -88,17 +92,17 @@
 
 ```text
 src/core/      下载内核（切块、调度、多节点）、视频缓存、fetch/XHR 钩子、<video> 地址钩子
-src/sites/     douyin.js、xhs.js（视频数据）、xhs-images.js（图片节点）
+src/sites/     douyin.js、xhs.js（视频数据）、douyin-images.js（图集预下）、xhs-images.js（图片节点）
 src/ui/        设置面板（Shadow DOM，样式只用 Rakko Design token）
-scripts/       build.mjs（拼成油猴脚本）、sync-design.sh（同步 vendor/rakko-design）
+scripts/       build.mjs（按站点拼成两个油猴脚本）、sync-design.sh（同步 vendor/rakko-design）
 dev/           单元测试、CDP 端到端测试工具
 vendor/        Rakko Design 外来件，只能由 scripts/sync-design.sh 生成，不要手改
 ```
 
-- 构建：`node scripts/build.mjs [版本号]` → `user_scripts/dxtr.user.js`
+- 构建：`node scripts/build.mjs [版本号]` → `user_scripts/douyin.user.js`、`user_scripts/xhs.user.js`
 - 单元测试：`node dev/run-tests.js`
 - 端到端（需要本机有开着 CDP 9222 的 Chrome）：
-  - `node dev/inject.mjs <网址> [秒数]`：注入构建产物打开页面，打印诊断报告；
+  - `node dev/inject.mjs <网址> [秒数]`：按网址选对应站点的构建产物注入并打开页面，打印诊断报告；
   - `node dev/hit-test.mjs`、`node dev/feed-test.mjs`：抖音秒开 / 刷下一条；
   - `node dev/image-bench.mjs [轮数]`：小红书封面开关对比；`node dev/note-bench.mjs <笔记网址…>`：轮播图。
 

@@ -3,7 +3,7 @@
   "use strict";
   const host = location.hostname;
   const site = /(^|\.)douyin\.com$/.test(host) ? "douyin" : /(^|\.)xiaohongshu\.com$/.test(host) ? "xhs" : "";
-  if (!site) return;
+  if (!site || !DXTR.sites[site]) return; // each build carries only its own site module
   DXTR.site = site;
   DXTR.sites[site].install();
   if (site === "xhs") DXTR.xhsImages?.install();
@@ -25,8 +25,8 @@
         media: DXTR.mediaHook.stats(),
         mseFetch: DXTR.mediaFetch.stats(),
         images: DXTR.xhsImages?.stats?.() || null,
-        ads: site === "douyin" ? DXTR.sites.douyin.adStats() : null,
-        pictures: site === "douyin" ? DXTR.douyinImages.stats() : null,
+        ads: site === "douyin" ? DXTR.sites.douyin?.adStats() : null,
+        pictures: site === "douyin" ? DXTR.douyinImages?.stats() : null,
         log: DXTR.log.lines().slice(-60)
       }, null, 2);
     }

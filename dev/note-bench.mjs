@@ -5,7 +5,7 @@ import { readFileSync } from "node:fs";
 import { connectPage, sleep } from "./cdp.mjs";
 
 const urls = process.argv.slice(2);
-const script = readFileSync(new URL("../user_scripts/dxtr.user.js", import.meta.url), "utf8");
+const script = readFileSync(new URL("../user_scripts/xhs.user.js", import.meta.url), "utf8");
 const slides = `(() => {
   const imgs = [...document.querySelectorAll('.note-slider img, .swiper-slide img, .media-container img')].filter(i => /xhscdn|xiaohongshu/.test(i.currentSrc || i.getAttribute('src') || ''));
   const uniq = [...new Map(imgs.map(i => [i.getAttribute('src'), i])).values()];

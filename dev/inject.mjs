@@ -12,7 +12,9 @@ const evalAt = args.indexOf("--eval");
 const extra = evalAt >= 0 ? args[evalAt + 1] : "";
 const setAt = args.indexOf("--settings");
 const settings = setAt >= 0 ? args[setAt + 1] : "";
-const script = readFileSync(new URL("../user_scripts/dxtr.user.js", import.meta.url), "utf8");
+// One build per site: pick it from the page's domain.
+const scriptFile = /(^|\.)xiaohongshu\.com$/.test(new URL(url).hostname) ? "xhs.user.js" : "douyin.user.js";
+const script = readFileSync(new URL(`../user_scripts/${scriptFile}`, import.meta.url), "utf8");
 
 const page = await connectPage();
 try {

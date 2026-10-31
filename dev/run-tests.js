@@ -292,6 +292,23 @@ test("cache eviction never revokes the blob a <video> is playing", async () => {
   assert.equal(V.record("b"), null, "B was evicted instead");
 });
 
+test("build: one userscript per site, each with only its own site modules", async () => {
+  const { build, TARGETS } = await import(path.join(ROOT, "scripts/build.mjs"));
+  const own = { douyin: "www.douyin.com", xhs: "www.xiaohongshu.com" };
+  assert.deepEqual(Object.keys(TARGETS).sort(), ["douyin", "xhs"]);
+  for (const [target, other] of [["douyin", "xhs"], ["xhs", "douyin"]]) {
+    const out = build(target, "test");
+    const sites = [...out.matchAll(/^\/\/ ---- src\/sites\/(\S+)$/gm)].map((m) => m[1]);
+    assert.ok(sites.length > 0, `${target}: has site modules`);
+    assert.ok(sites.every((f) => f.startsWith(target)), `${target}: only its own site modules (${sites})`);
+    assert.ok(!out.includes(`// ---- src/sites/${other}`), `${target}: no ${other} module`);
+    const matches = [...out.matchAll(/^\/\/ @match\s+(\S+)$/gm)].map((m) => m[1]);
+    assert.deepEqual(matches, [`https://${own[target]}/*`]);
+    assert.ok(out.includes(`/user_scripts/${TARGETS[target].file}`), `${target}: update URL points at its own file`);
+    new Function(out); // parses
+  }
+});
+
 // ---- run ----------------------------------------------------------------------------------
 (async () => {
   let failed = 0;

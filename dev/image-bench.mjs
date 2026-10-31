@@ -5,7 +5,9 @@ import { connectPage, sleep } from "./cdp.mjs";
 
 const rounds = Number(process.argv[2] || 3);
 const url = process.argv[3] || "https://www.xiaohongshu.com/explore";
-const script = readFileSync(new URL("../user_scripts/dxtr.user.js", import.meta.url), "utf8");
+// One build per site: pick it from the page's domain.
+const scriptFile = /(^|\.)xiaohongshu\.com$/.test(new URL(url).hostname) ? "xhs.user.js" : "douyin.user.js";
+const script = readFileSync(new URL(`../user_scripts/${scriptFile}`, import.meta.url), "utf8");
 const probe = `(() => {
   const imgs = [...document.querySelectorAll('img')].filter(i => /sns-webpic|sns-img|sns-na-i|ci\\.xiao/.test(i.currentSrc || i.getAttribute('src') || ''));
   const inView = imgs.filter(i => { const r = i.getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight && r.width > 50; });
