@@ -8,6 +8,7 @@
   DXTR.sites[site].install();
   if (site === "xhs") DXTR.xhsImages?.install();
   if (site === "douyin") DXTR.douyinImages?.install();
+  if (site === "douyin") DXTR.douyinClean?.install();
   DXTR.panel?.install();
 
   window.__dxtrDebug = {

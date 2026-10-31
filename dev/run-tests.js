@@ -292,6 +292,41 @@ test("cache eviction never revokes the blob a <video> is playing", async () => {
   assert.equal(V.record("b"), null, "B was evicted instead");
 });
 
+test("douyin clean: only the bare home page and 精选 go to the feed, once per tab", () => {
+  const C = loadModules(["src/core/settings.js", "src/sites/douyin-clean.js"]).douyinClean;
+  const feed = "https://www.douyin.com/?recommend=1&from_nav=1";
+  for (const href of ["https://www.douyin.com/", "https://www.douyin.com", "https://www.douyin.com/jingxuan",
+    "https://www.douyin.com/jingxuan/", "https://www.douyin.com/jingxuan?from_nav=1", "https://douyin.com/"]) {
+    assert.equal(C.recommendTarget(href, false), feed, href);
+    assert.equal(C.recommendTarget(href, true), "", `${href} (already jumped)`);
+  }
+  for (const href of ["https://www.douyin.com/?recommend=1", "https://www.douyin.com/?recommend=1&from_nav=1",
+    "https://www.douyin.com/jingxuan?modal_id=7701695837625191695", "https://www.douyin.com/?modal_id=1",
+    "https://www.douyin.com/follow", "https://www.douyin.com/user/self", "https://www.douyin.com/video/1",
+    "https://www.douyin.com/jingxuan/game", "https://www.example.com/", "not a url"]) {
+    assert.equal(C.recommendTarget(href, false), "", href);
+  }
+});
+
+test("douyin clean: search address, query read back, active rail entry", () => {
+  const C = loadModules(["src/core/settings.js", "src/sites/douyin-clean.js"]).douyinClean;
+  assert.equal(C.searchUrl("猫 咪&"), "https://www.douyin.com/search/%E7%8C%AB%20%E5%92%AA%26?type=general");
+  assert.equal(C.currentQuery("https://www.douyin.com/root/search/%E9%A3%8E%E6%99%AF?aid=x&type=general"), "风景");
+  assert.equal(C.currentQuery("https://www.douyin.com/search/abc?type=video"), "abc");
+  assert.equal(C.currentQuery("https://www.douyin.com/?recommend=1"), "");
+  assert.equal(C.activeTab("https://www.douyin.com/?recommend=1"), "recommend");
+  assert.equal(C.activeTab("https://www.douyin.com/follow?from_nav=1"), "follow");
+  assert.equal(C.activeTab("https://www.douyin.com/user/self?from_tab_name=main"), "self");
+  assert.equal(C.activeTab("https://www.douyin.com/user/MS4wLjAB"), "");
+});
+
+test("settings: clean defaults on, can be turned off", () => {
+  const S = loadModules(["src/core/settings.js"]).settings;
+  assert.equal(S.get().clean, true);
+  assert.equal(S.normalize({ clean: false }).clean, false);
+  assert.equal(S.normalize({}).clean, true);
+});
+
 test("build: one userscript per site, each with only its own site modules", async () => {
   const { build, TARGETS } = await import(path.join(ROOT, "scripts/build.mjs"));
   const own = { douyin: "www.douyin.com", xhs: "www.xiaohongshu.com" };

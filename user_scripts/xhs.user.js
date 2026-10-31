@@ -40,6 +40,7 @@ DXTR.settings = (() => {
     cacheMB: 300,           // total size of finished videos kept in memory
     images: true,           // Xiaohongshu image node racing + prefetch
     adblock: true,          // Douyin: drop ads from the feed
+    clean: true,            // Douyin: slim left rail instead of the navigation + top bar, open on the feed
     floatingButton: true,
     floatingTop: null,      // share of window height where the ball was dragged to
     debug: false
@@ -59,6 +60,7 @@ DXTR.settings = (() => {
       cacheMB: num(s.cacheMB, 50, 2000, DEFAULTS.cacheMB),
       images: s.images !== false,
       adblock: s.adblock !== false,
+      clean: s.clean !== false,
       floatingButton: s.floatingButton !== false,
       floatingTop: s.floatingTop != null && Number(s.floatingTop) >= 0 && Number(s.floatingTop) <= 1 ? Number(s.floatingTop) : null,
       debug: s.debug === true
@@ -1605,7 +1607,8 @@ hr { border: 0; border-top: 1px solid var(--color-border); margin: 8px 0; }
       toggle("quality", "自动最高画质", "只在网站给出的画质里挑", () => S.get().quality === "best",
         () => S.set({ quality: S.get().quality === "best" ? "site" : "best" })),
       ...(DXTR.site === "xhs" ? [toggle("images", "图片换最快节点", "测速选节点，慢图自动补发")] : []),
-      ...(DXTR.site === "douyin" ? [toggle("adblock", "去广告", "推荐流里的广告直接删掉，漏网的自动划走")] : []),
+      ...(DXTR.site === "douyin" ? [toggle("adblock", "去广告", "推荐流里的广告直接删掉，漏网的自动划走"),
+        toggle("clean", "净化页面", "去掉左侧导航和顶栏，换成细图标栏；打开直接进推荐")] : []),
       choice("threads", "并发线程", [["auto", "自动"], ...S.THREAD_CHOICES.map((n) => [n, String(n)])]),
       choice("prefetchNext", "预加载后面几条", [0, 1, 2, 3, 4, 5].map((n) => [n, String(n)])),
       choice("cacheMB", "内存缓存上限", [[150, "150 MB"], [300, "300 MB"], [600, "600 MB"], [1000, "1 GB"]]),
@@ -1680,6 +1683,7 @@ hr { border: 0; border-top: 1px solid var(--color-border); margin: 8px 0; }
   DXTR.sites[site].install();
   if (site === "xhs") DXTR.xhsImages?.install();
   if (site === "douyin") DXTR.douyinImages?.install();
+  if (site === "douyin") DXTR.douyinClean?.install();
   DXTR.panel?.install();
 
   window.__dxtrDebug = {

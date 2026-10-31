@@ -16,6 +16,7 @@ DXTR.settings = (() => {
     cacheMB: 300,           // total size of finished videos kept in memory
     images: true,           // Xiaohongshu image node racing + prefetch
     adblock: true,          // Douyin: drop ads from the feed
+    clean: true,            // Douyin: slim left rail instead of the navigation + top bar, open on the feed
     floatingButton: true,
     floatingTop: null,      // share of window height where the ball was dragged to
     debug: false
@@ -35,6 +36,7 @@ DXTR.settings = (() => {
       cacheMB: num(s.cacheMB, 50, 2000, DEFAULTS.cacheMB),
       images: s.images !== false,
       adblock: s.adblock !== false,
+      clean: s.clean !== false,
       floatingButton: s.floatingButton !== false,
       floatingTop: s.floatingTop != null && Number(s.floatingTop) >= 0 && Number(s.floatingTop) <= 1 ? Number(s.floatingTop) : null,
       debug: s.debug === true
