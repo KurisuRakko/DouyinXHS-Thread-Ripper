@@ -1,8 +1,8 @@
 # 抖音 / 小红书 线程撕裂者
 
 > **本仓库已拆分为以下两个仓库，此后不再更新：**
-> - 抖音：[KurisuRakko/Douyin-Thread-Ripper](https://github.com/KurisuRakko/Douyin-Thread-Ripper)
-> - 小红书：[KurisuRakko/XHS-Thread-Ripper](https://github.com/KurisuRakko/XHS-Thread-Ripper)
+> - 抖音：[KurisuRakko/Texas](https://github.com/KurisuRakko/Texas)
+> - 小红书：[KurisuRakko/Mostima](https://github.com/KurisuRakko/Mostima)
 
 适用于桌面浏览器的抖音、小红书网页版用户脚本（Tampermonkey / Violentmonkey），用于在海外网络环境下加快视频与图片加载。设计思路参考
 [Bilibili 线程撕裂者](https://github.com/MrTangLuyao/Bilibili-thread-ripper)（多连接、多节点并发下载），代码针对这两个站点独立实现。
